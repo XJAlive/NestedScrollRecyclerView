@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewParent;
 
 /**
- * Copy from Android design library
+ * copy from support/design
  * <p>
  * Utility helper for moving a {@link View} around using
  * {@link View#offsetLeftAndRight(int)} and

@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * Copy from Android design library
+ * copy from support/design
  * <p>
  * Behavior will automatically sets up a {@link ViewOffsetHelper} on a {@link View}.
  */

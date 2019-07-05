@@ -11,12 +11,12 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.xj.widget.refresh.HomeSmartRefreshHeader;
+
 import java.util.List;
 
 /**
- * Copy from Android design library
- * <p/>
- * Created by xujun
+ * 来自9.0以下support/design包
  */
 public abstract class HeaderScrollingViewBehavior extends ViewOffsetBehavior<View> {
     private final Rect mTempRect1 = new Rect();

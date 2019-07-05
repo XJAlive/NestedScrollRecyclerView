@@ -3,7 +3,6 @@ package com.example.xj.widget;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -35,6 +34,13 @@ public class DistanceHelper {
         return mVerticalHelper;
     }
 
+    /**
+     * 计算当前velocity能够滑动的距离
+     *
+     * @param velocityX
+     * @param velocityY
+     * @return
+     */
     public int[] calculateScrollDistance(int velocityX, int velocityY) {
         mScroller = new OverScroller(mContext, new DecelerateInterpolator());
 
@@ -46,7 +52,13 @@ public class DistanceHelper {
         return outDist;
     }
 
-
+    /**
+     * 通过当前屏幕Item高度估算recyclerView子Item平均高度
+     *
+     * @param layoutManager
+     * @param helper
+     * @return
+     */
     public float computeDistancePerChild(RecyclerView.LayoutManager layoutManager,
                                          OrientationHelper helper) {
         View minPosView = null;
