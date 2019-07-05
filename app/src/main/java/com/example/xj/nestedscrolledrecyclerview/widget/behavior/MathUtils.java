@@ -1,4 +1,4 @@
-package com.example.xj.widget;
+package com.example.xj.nestedscrolledrecyclerview.widget.behavior;
 
 /**
  * Copy from Android design library

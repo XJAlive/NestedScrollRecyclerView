@@ -1,4 +1,4 @@
-package com.example.xj.widget;
+package com.example.xj.nestedscrolledrecyclerview.widget.behavior;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

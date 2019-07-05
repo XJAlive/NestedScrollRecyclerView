@@ -1,4 +1,4 @@
-package com.example.xj.widget;
+package com.example.xj.nestedscrolledrecyclerview.widget.behavior;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -7,14 +7,15 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import com.example.xj.nestedscrolledrecyclerview.R;
+
 import java.util.List;
 import java.util.Objects;
 
 
 /**
- * 可滚动的 Content Behavior
- * <p/>
- * Created by xujun
+ * 底部RecyclerView Behavior
+ * 跟随顶部控件进行位移滚动
  */
 public class HomeContentBehavior extends HeaderScrollingViewBehavior {
     private static final String TAG = "HomeContentBehavior";
@@ -55,10 +56,8 @@ public class HomeContentBehavior extends HeaderScrollingViewBehavior {
         child.setTranslationY(0 - translationY);
 
         if (mOnPagerStateListener != null) {
-            mOnPagerStateListener.onViewTranslationChanged(0 - translationY);
-
             float ratio = translationY * 1.0f / child.getMeasuredHeight();
-            mOnPagerStateListener.onViewChanged(ratio);
+            mOnPagerStateListener.onViewTranslationChanged(0 - translationY, ratio);
         }
     }
 
@@ -89,8 +88,7 @@ public class HomeContentBehavior extends HeaderScrollingViewBehavior {
     }
 
     private boolean isDependOn(View dependency) {
-//        return dependency != null && dependency.getId() == R.id.fl_home_header;
-        return true;
+        return dependency != null && dependency.getId() == R.id.fl_home_header;
     }
 
     public OnPagerStateListener getOnPagerStateListener() {
@@ -111,9 +109,7 @@ public class HomeContentBehavior extends HeaderScrollingViewBehavior {
          *
          * @param ratio
          */
-        void onViewChanged(float ratio);
-
-        void onViewTranslationChanged(float translationY);
+        void onViewTranslationChanged(float translationY, float ratio);
     }
 
 }

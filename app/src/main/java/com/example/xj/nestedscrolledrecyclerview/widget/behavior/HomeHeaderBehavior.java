@@ -1,4 +1,4 @@
-package com.example.xj.widget;
+package com.example.xj.nestedscrolledrecyclerview.widget.behavior;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -21,7 +21,10 @@ import android.widget.OverScroller;
 
 import java.lang.ref.WeakReference;
 
-
+/**
+ * 顶部RecyclerView Behavior
+ * RecyclerView滑动到底部后开始嵌套滚动,进行位移
+ */
 public class HomeHeaderBehavior extends ViewOffsetBehavior {
     private static final String TAG = "UcNewsHeaderPager";
     public static final int STATE_OPENED = 0;

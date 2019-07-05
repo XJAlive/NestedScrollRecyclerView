@@ -1,4 +1,4 @@
-package com.example.xj.widget;
+package com.example.xj.nestedscrolledrecyclerview.widget.behavior;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -10,8 +10,6 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.example.xj.widget.refresh.HomeSmartRefreshHeader;
 
 import java.util.List;
 

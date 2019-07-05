@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="behavior_home_header">com.example.xj.widget.HomeHeaderBehavior</string>
-    <string name="behavior_home_content">com.example.xj.widget..HomeContentBehavior</string>
+    <string name="behavior_home_header">com.example.xj.nestedscrolledrecyclerview.HomeHeaderBehavior</string>
+    <string name="behavior_home_content">com.example.xj.nestedscrolledrecyclerview.HomeContentBehavior</string>
 </resources>

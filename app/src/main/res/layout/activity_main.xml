@@ -60,13 +60,13 @@
             android:splitMotionEvents="false"
             app:layout_behavior="@string/behavior_home_content">
 
-            <com.example.xj.widget.refresh.HomeSmartRefreshHeader
+            <com.scwang.smartrefresh.layout.SmartRefreshLayout
                 android:id="@+id/srl_home_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:overScrollMode="never">
 
-                <com.example.xj.widget.refresh.HomeSmartRefreshHeader
+                <com.example.xj.nestedscrolledrecyclerview.widget.refresh.HomeSmartRefreshHeader
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/white" />
@@ -77,7 +77,7 @@
                     android:layout_height="match_parent"
                     android:overScrollMode="never" />
 
-            </com.example.xj.widget.refresh.HomeSmartRefreshHeader>
+            </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
         </RelativeLayout>
     </android.support.design.widget.CoordinatorLayout>

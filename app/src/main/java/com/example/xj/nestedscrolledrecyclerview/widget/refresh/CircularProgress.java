@@ -1,4 +1,4 @@
-package com.example.xj.widget.refresh;
+package com.example.xj.nestedscrolledrecyclerview.widget.refresh;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
@@ -18,7 +18,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
-import com.example.xj.widget.R;
+import com.example.xj.nestedscrolledrecyclerview.R;
+
 
 /**
  * 圆形进度条

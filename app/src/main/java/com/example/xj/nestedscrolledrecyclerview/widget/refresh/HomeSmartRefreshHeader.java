@@ -1,4 +1,4 @@
-package com.example.xj.widget.refresh;
+package com.example.xj.nestedscrolledrecyclerview.widget.refresh;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.xj.widget.R;
+import com.example.xj.nestedscrolledrecyclerview.R;
 import com.scwang.smartrefresh.layout.api.RefreshHeader;
 import com.scwang.smartrefresh.layout.api.RefreshKernel;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
