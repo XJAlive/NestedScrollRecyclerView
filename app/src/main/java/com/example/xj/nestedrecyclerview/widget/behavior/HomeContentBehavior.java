@@ -10,7 +10,6 @@ import android.view.View;
 import com.example.xj.nestedrecyclerview.R;
 
 import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -18,7 +17,7 @@ import java.util.Objects;
  * 跟随顶部控件进行位移滚动
  */
 public class HomeContentBehavior extends HeaderScrollingViewBehavior {
-    private static final String TAG = "HomeContentBehavior";
+    private static final String TAG = HomeContentBehavior.class.getName();
 
     OnPagerStateListener mOnPagerStateListener;
 

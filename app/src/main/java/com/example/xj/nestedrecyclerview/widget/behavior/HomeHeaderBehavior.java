@@ -26,7 +26,7 @@ import java.lang.ref.WeakReference;
  * RecyclerView滑动到底部后开始嵌套滚动,进行位移
  */
 public class HomeHeaderBehavior extends ViewOffsetBehavior {
-    private static final String TAG = "UcNewsHeaderPager";
+    private static final String TAG = HomeHeaderBehavior.class.getName();
     public static final int STATE_OPENED = 0;
     public static final int STATE_CLOSED = 1;//滚到下方为close
     public static final int DURATION_SHORT = 300;
