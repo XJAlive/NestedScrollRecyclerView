@@ -30,4 +30,11 @@ dependencies {
     //下拉刷新layout
     api 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-alpha-14'
     api 'com.scwang.smartrefresh:SmartRefreshHeader:1.1.0-alpha-14'
+
+    //rx系列
+    api "io.reactivex.rxjava2:rxjava:2.2.3"
+    api 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    api 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
+    api 'com.trello.rxlifecycle2:rxlifecycle-components:2.2.1'
+    api 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
 }

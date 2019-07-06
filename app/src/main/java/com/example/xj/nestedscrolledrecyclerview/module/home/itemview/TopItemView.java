@@ -58,7 +58,7 @@ public class TopItemView implements ItemViewDelegate<RecyclerViewBean> {
 
     @Override
     public boolean isForViewType(RecyclerViewBean item, int position) {
-        return item.getType() == RecyclerViewBean.TYPE_BOTTOM_ITEM;
+        return item.getType() == RecyclerViewBean.TYPE_TOP_ITEM;
     }
 
     @Override

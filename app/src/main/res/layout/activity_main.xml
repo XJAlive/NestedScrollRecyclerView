@@ -8,25 +8,16 @@
     android:splitMotionEvents="false">
 
     <!--搜索-->
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/cl_search"
+    <include
+        android:id="@+id/rl_tool_bar"
+        layout="@layout/block_home_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="48dp">
-
-        <EditText
-            android:id="@+id/et_search"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="大家都在搜:瓶盖挑战"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
-
-    </android.support.constraint.ConstraintLayout>
+        android:layout_height="48dp" />
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/cl_search"
+        android:layout_below="@id/rl_tool_bar"
         android:splitMotionEvents="false">
 
         <FrameLayout
@@ -87,7 +78,7 @@
         layout="@layout/block_home_top_tb"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_alignBottom="@id/cl_search"
+        android:layout_alignBottom="@id/rl_tool_bar"
         android:visibility="gone" />
 
 </RelativeLayout>

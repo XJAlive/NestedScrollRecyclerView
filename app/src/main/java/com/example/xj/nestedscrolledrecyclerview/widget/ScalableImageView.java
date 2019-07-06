@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.Log;
 
+import com.example.xj.nestedscrolledrecyclerview.R;
+
 /**
  * 可伸缩的ImageView
  */
