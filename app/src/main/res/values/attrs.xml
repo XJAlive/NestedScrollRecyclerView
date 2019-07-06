@@ -5,4 +5,12 @@
         <attr name="circularColor" format="color" />
     </declare-styleable>
 
+    <declare-styleable name="ScalableImageView">
+        <attr name="riv_corner_radius" format="dimension" />
+        <attr name="riv_border_width" format="dimension" />
+        <attr name="riv_border_color" format="color" />
+        <attr name="riv_mutate_background" format="boolean" />
+        <attr name="riv_oval" format="boolean" />
+        <attr name="android:scaleType" />
+    </declare-styleable>
 </resources>

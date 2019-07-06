@@ -3,8 +3,8 @@ package com.example.xj.nestedscrolledrecyclerview.widget.recyclerview.bean;
 import java.io.Serializable;
 
 public class RecyclerViewBean implements Serializable {
-    public static final int TYPE_TOP_ITEM = 1;//图片
-    public static final int TYPE_BOTTOM_ITEM = 2;//标题
+    public static final int TYPE_TOP_ITEM = 1;
+    public static final int TYPE_BOTTOM_ITEM = 2;
     private String id;
     private int type;
     private Object data;
