@@ -9,7 +9,7 @@
     android:paddingBottom="10dp"
     android:paddingTop="10dp">
 
-    <com.example.xj.nestedscrolledrecyclerview.widget.refresh.CircularProgress
+    <com.example.xj.nestedrecyclerview.widget.refresh.CircularProgress
         android:id="@+id/footer_load_more_view"
         android:layout_width="24dip"
         android:layout_height="24dip"

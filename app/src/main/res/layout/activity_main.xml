@@ -20,8 +20,8 @@
         android:layout_below="@id/rl_tool_bar"
         android:splitMotionEvents="false">
 
-        <FrameLayout
-            android:id="@+id/fl_home_header"
+        <RelativeLayout
+            android:id="@+id/rl_home_header"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:splitMotionEvents="false"
@@ -41,7 +41,7 @@
                     android:overScrollMode="never"
                     android:splitMotionEvents="false" />
             </com.scwang.smartrefresh.layout.SmartRefreshLayout>
-        </FrameLayout>
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/rl_home_content"
@@ -57,7 +57,7 @@
                 android:layout_height="match_parent"
                 android:overScrollMode="never">
 
-                <com.example.xj.nestedscrolledrecyclerview.widget.refresh.HomeSmartRefreshHeader
+                <com.example.xj.nestedrecyclerview.widget.refresh.HomeSmartRefreshHeader
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/white" />

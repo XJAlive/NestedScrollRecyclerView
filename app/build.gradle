@@ -37,4 +37,11 @@ dependencies {
     api 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
     api 'com.trello.rxlifecycle2:rxlifecycle-components:2.2.1'
     api 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
+
+    debugCompile ('me.ele:uetool:1.0.15', {
+        exclude group: 'com.android.support'
+    })
+    releaseCompile ('me.ele:uetool-no-op:1.0.15', {
+        exclude group: 'com.android.support'
+    })
 }
