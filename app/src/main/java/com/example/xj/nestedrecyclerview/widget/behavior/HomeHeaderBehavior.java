@@ -23,12 +23,11 @@ import java.lang.ref.WeakReference;
 
 /**
  * 顶部RecyclerView Behavior
- * RecyclerView滑动到底部后开始嵌套滚动,进行位移
  */
 public class HomeHeaderBehavior extends ViewOffsetBehavior {
     private static final String TAG = HomeHeaderBehavior.class.getName();
-    public static final int STATE_OPENED = 0;
-    public static final int STATE_CLOSED = 1;//滚到下方为close
+    public static final int STATE_OPENED = 0;//默认为打开状态
+    public static final int STATE_CLOSED = 1;
     public static final int DURATION_SHORT = 300;
     public static final int DURATION_LONG = 600;
 
@@ -44,16 +43,13 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
     private WeakReference<View> mChild;
 
     private boolean isUp;//手势方向
-    int measuredHeight;
+    private int measuredHeight;
 
     private VelocityTracker mVelocityTracker;
     private int mScrollPointerId = -1;
 
-    int mMinFlingVelocity;
-    int mMaxFlingVelocity;
-
-    float velocityX;
-    float velocityY;
+    private int mMinFlingVelocity;
+    private int mMaxFlingVelocity;
 
     public void setPagerStateListener(OnPagerStateListener pagerStateListener) {
         mPagerStateListener = pagerStateListener;
@@ -69,7 +65,7 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
         mOverScroller = new OverScroller(context, new DecelerateInterpolator());
         mDistanceHelper = new DistanceHelper(context);
 
-        final ViewConfiguration vc = ViewConfiguration.get(context);
+        ViewConfiguration vc = ViewConfiguration.get(context);
         mMinFlingVelocity = vc.getScaledMinimumFlingVelocity();
         mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
     }
@@ -77,56 +73,70 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
     @Override
     protected void layoutChild(CoordinatorLayout parent, View child, int layoutDirection) {
         super.layoutChild(parent, child, layoutDirection);
-        mParent = new WeakReference<CoordinatorLayout>(parent);
-        mChild = new WeakReference<View>(child);
+        mParent = new WeakReference<>(parent);
+        mChild = new WeakReference<>(child);
     }
 
+    /**
+     * 是否接受嵌套滚动
+     *
+     * @param coordinatorLayout
+     * @param child
+     * @param directTargetChild
+     * @param target
+     * @param nestedScrollAxes
+     * @param type
+     * @return true 父布局(CoordinatorLayout)处理滑动事件 false Behavior独立处理滑动事件
+     */
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, View child, View
             directTargetChild, View target, int nestedScrollAxes, int type) {
         //拦截垂直方向上的滚动事件且当前状态是打开的
-//        Log.d(TAG, "onStartNestedScroll: nestedScrollAxes=" + nestedScrollAxes + " b = " + b);
-        boolean b = (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0 && !isClosed(child);
-//        LogUtil.d(TAG, "是否由父类共同处理滑动:" + b);
-
-        return b;
-    }
-
-    @Override
-    public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target, int type) {
-        super.onStopNestedScroll(coordinatorLayout, child, target, type);
-//        LogUtil.i("xj", "--------->onStopNestedScroll");
-        mVelocityTracker.computeCurrentVelocity(1000, mMaxFlingVelocity);
-        velocityX = mVelocityTracker.getXVelocity(mScrollPointerId);
-        velocityY = mVelocityTracker.getYVelocity(mScrollPointerId);
-        mVelocityTracker.clear();
-
-        //behavior机制可能更新不到close状态
-//        refreshState(child);
-
-        dispathFling(coordinatorLayout, child, velocityX, velocityY);
+        boolean accepted = (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0 && !isClosed(child);
+        Log.d(TAG, "--------->onStartNestedScroll,是否由父布局共同处理滑动:" + accepted);
+        return accepted;
     }
 
     /**
-     * 底部位置,做偏移处理
+     * 结束嵌套滚动
      *
      * @param coordinatorLayout
      * @param child
      * @param target
-     * @param dx
-     * @param dy
-     * @param consumed
+     * @param type
+     */
+    @Override
+    public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target, int type) {
+        super.onStopNestedScroll(coordinatorLayout, child, target, type);
+        Log.d(TAG, "--------->onStopNestedScroll");
+        mVelocityTracker.computeCurrentVelocity(1000, mMaxFlingVelocity);
+        float velocityX = mVelocityTracker.getXVelocity(mScrollPointerId);
+        float velocityY = mVelocityTracker.getYVelocity(mScrollPointerId);
+        mVelocityTracker.clear();
+
+        //根据需要做模拟惯性滚动
+        dispathFling(coordinatorLayout, child, velocityX, velocityY);
+    }
+
+    /**
+     * 嵌套滚动前调用
+     * Behavior通过consumed告诉coordinatorLayout自己消费了多少距离
+     *
+     * @param coordinatorLayout
+     * @param child
+     * @param target
+     * @param dx                X轴总计滑动距离 = consumed[0] + dxUnconsumed
+     * @param dy                Y轴总计滑动距离
+     * @param consumed          consumed[]表示当前Behavior所在控件实际消费的滑动距离,0：X轴 1：Y轴
      */
     @Override
     public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dx, int dy, int[] consumed, int type) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type);
         //dy>0 scroll up;dy<0,scroll down
-//        LogUtil.i(TAG, "onNestedPreScroll: dy=" + dy);
         isUp = dy > 0;
 
         measuredHeight = child.getMeasuredHeight();//控件高度
-
-//        LogUtil.w(TAG, "onNestedPreScroll ,child.getMeasuredHeight()=" + child.getMeasuredHeight());
+        Log.i(TAG, "--------->onNestedPreScroll: dy=" + dy);
 
         float lastTranslationY = child.getTranslationY();//滑动前偏移
 
@@ -134,28 +144,27 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
             return;
         }
 
+        //判断滑动方向
         if (isUp) {
-            //上滑
+            //滚动到了RecyclerView底部,由父控件统一处理滑动,进行位置偏移,即交界点从屏幕内移出过程
             if (isRecyclerViewBottom(child)) {
-                //滚动recyclerView底部,有父类处理滑动
                 if (lastTranslationY - dy <= 0 - measuredHeight) {
                     //考虑顶部边界
                     child.setTranslationY(0 - measuredHeight);
-                    consumed[1] = (int) (lastTranslationY + measuredHeight);//实际消费距离
-//                    LogUtil.i("xj", "onNestedPreScroll>>>>调用修改状态为close");
-
+                    //实际消费距离为当前位置到顶部的距离
+                    consumed[1] = (int) (lastTranslationY + measuredHeight);
                     changeState(STATE_CLOSED);
                 } else {
                     child.setTranslationY(lastTranslationY - dy);
-//                    LogUtil.i("xj", "onNestedPreScroll>>>>判断是否需要修改状态");
                     onTranslationFinished(child);
                     consumed[1] = dy;
                 }
             }
         } else {
+            //非打开状态都要进行联滚
             if (!isOpen(child)) {
-                //非打开状态都要进行联滚
                 if (lastTranslationY - dy >= 0) {
+                    //考虑底部边界
                     child.setTranslationY(0);
                     changeState(STATE_OPENED);
                     consumed[1] = (int) lastTranslationY;
@@ -170,15 +179,15 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
     }
 
     /**
-     * 结合子View联滚处理
+     * 嵌套滚动后调用
      *
      * @param coordinatorLayout
      * @param child
      * @param target
      * @param dxConsumed
-     * @param dyConsumed
+     * @param dyConsumed        Y轴已消耗距离
      * @param dxUnconsumed
-     * @param dyUnconsumed
+     * @param dyUnconsumed      Y轴未消耗距离
      */
     @Override
     public void onNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target,
@@ -189,9 +198,8 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
         }
 
         if (isUp) {
-            //上滑且滑动到底部，需要偏移
+            //上滑且滑动到底部，需要偏移,即交界点从屏幕最下方开始往上移动过程
             if (isRecyclerViewBottom(child)) {
-                //父View继续消费
                 child.setTranslationY(child.getTranslationY() - dyUnconsumed);
                 onTranslationFinished(child);
             }
@@ -203,15 +211,33 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
         }
     }
 
-
+    /**
+     * 惯性滚动前调用
+     *
+     * @param coordinatorLayout
+     * @param child
+     * @param target
+     * @param velocityX
+     * @param velocityY
+     * @return true Behavior处理惯性滚动 false 由父布局处理
+     */
     @Override
     public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, View child, View target, float velocityX, float velocityY) {
-        // consumed the flinging behavior until Closed
-        boolean coumsed = isOpen(child) || isClosed(child);//这两种状态由子类滚动
-//        LogUtil.i(TAG, "onNestedPreFling: coumsed=" + coumsed);
+        //这两种状态由子类滚动
+        boolean coumsed = isOpen(child) || isClosed(child);
+//        Log.i(TAG, "onNestedPreFling: coumsed=" + coumsed);
         return !coumsed;
     }
 
+    /**
+     * 是否处理了惯性滚动
+     *
+     * @param coordinatorLayout
+     * @param child
+     * @param target
+     * @param velocityX
+     * @param velocityY
+     */
     @Override
     public boolean onNestedFling(CoordinatorLayout coordinatorLayout, View child, View target,
                                  float velocityX, float velocityY, boolean consumed) {
@@ -226,23 +252,17 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
      * @return
      */
     private boolean isRecyclerViewBottom(View child) {
+        boolean isBottom = false;
         RecyclerView recyclerView = findChildTypeOfRecyclerView(child);
-        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-        int lastPosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
-        return lastPosition == recyclerView.getAdapter().getItemCount() - 1;
+        if (recyclerView != null) {
+            LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+            int lastPosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
+            isBottom = lastPosition == recyclerView.getAdapter().getItemCount() - 1;
+        }
+
+        return isBottom;
     }
 
-    /**
-     * 是否滚动到头部
-     *
-     * @param child
-     * @return
-     */
-    private boolean isRecyclerViewTop(View child) {
-        RecyclerView recyclerView = findChildTypeOfRecyclerView(child);
-        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-        return linearLayoutManager.findFirstVisibleItemPosition() == 0;//是否处于顶部
-    }
 
     /**
      * 关闭状态
@@ -252,7 +272,7 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
      */
     private boolean isClosed(View child) {
         boolean isClosed = child.getTranslationY() == 0 - child.getMeasuredHeight();
-//        LogUtil.w(TAG, "isClosed ,child.getMeasuredHeight()=" + child.getMeasuredHeight());
+//        Log.w(TAG, "isClosed ,child.getMeasuredHeight()=" + child.getMeasuredHeight());
         //第三方登录会导致更改为close,因为child.getMeasuredHeight()=0
         if (isClosed && mCurState != STATE_CLOSED && child.getMeasuredHeight() != 0) {
             changeState(STATE_CLOSED);
@@ -271,7 +291,7 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
     }
 
     private void changeState(int newState) {
-//        LogUtil.i("xj", "--->修改状态,0打开，1关闭，newState:" + newState + "  mCurState:" + mCurState);
+//        Log.i("xj", "--->修改状态,0打开，1关闭，newState:" + newState + "  mCurState:" + mCurState);
 
         if (mCurState != newState) {
             mCurState = newState;
@@ -310,12 +330,12 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
         return super.onInterceptTouchEvent(parent, child, ev);
     }
 
-    int needScrollChildCount = 0;
-    float distancePerChild;
-    int hDeltaJump;
+    int hDeltaJump;//以抬手速率估算滚动总Item个数
+    int needScrollChildCount = 0;//滚动到底部之后还需要下面RecyclerView滚动位置
+    float distancePerChild; //屏幕内Item估算高度
 
     /**
-     * 共同处理惯性滑动
+     * 模拟惯性滚动
      *
      * @param parent
      * @param child
@@ -336,13 +356,14 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     if (!isUp || needScrollChildCount <= 0) {
+                        //顶部RecyclerView能够消耗当前惯性滚动
                         return;
                     }
                     if (Math.abs(needScrollChildCount * distancePerChild) < measuredHeight) {
                         //需要偏移的量小于屏幕高度，只做偏移
                         startFling(0, (int) (velocityY / 8));
                     } else {
-                        //上面recyclerview+偏移+下面recyclerview
+                        //上面recyclerview+偏移+下面recyclerview滚动
                         startFling(0, (int) (velocityY * Math.abs((float) needScrollChildCount / hDeltaJump)));
                     }
                 }
@@ -362,23 +383,25 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
         hDeltaJump = Math.abs(hDeltaJump);
         if (isUp) {
             if (linearLayoutManager.findLastCompletelyVisibleItemPosition() == recyclerView.getAdapter().getItemCount() - 1) {
+                //零界点在屏幕内时的滚动
                 startFling(0, (int) velocityY / 8);
             } else {
-                needScrollChildCount = lastVisiableItem + hDeltaJump - recyclerView.getAdapter().getItemCount();//滚动到底部之后还需要滚动位置
+                //滚动到底部之后还需要下面RecyclerView滚动位置
+                needScrollChildCount = lastVisiableItem + hDeltaJump - recyclerView.getAdapter().getItemCount();
                 distancePerChild = mDistanceHelper.computeDistancePerChild(linearLayoutManager, mDistanceHelper.getVerticalHelper(linearLayoutManager));
             }
         } else {
             if (linearLayoutManager.findLastCompletelyVisibleItemPosition() == recyclerView.getAdapter().getItemCount() - 1) {
-                //模拟滚动
+                //零界点在屏幕内时的滚动
                 startFling(0, (int) velocityY / 8);
             }
         }
 
-//        LogUtil.i("xj", "lastVisiableItem=" + lastVisiableItem + " 需要滚动hDeltaJump=" + hDeltaJump + " 下个recyclerview需要滚动: " + needScrollChildCount);
+        Log.i("xj", "lastVisiableItem=" + lastVisiableItem + " 需要滚动hDeltaJump=" + hDeltaJump + " 下个recyclerview需要滚动: " + needScrollChildCount);
     }
 
     /**
-     * 获取滚动position个数
+     * 计算此速率需要滚动的position个数
      *
      * @param layoutManager
      * @param helper
@@ -390,7 +413,7 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
                                                  OrientationHelper helper, int velocityX, int velocityY) {
         int[] distances = mDistanceHelper.calculateScrollDistance(velocityX, velocityY);
         float distancePerChild = mDistanceHelper.computeDistancePerChild(layoutManager, helper);
-//        LogUtil.w("xj", "总共滑动距离：" + distances[1] + " 子view高度:" + distancePerChild);
+//        Log.w("xj", "总共滑动距离：" + distances[1] + " 子view高度:" + distancePerChild);
         if (distancePerChild <= 0) {
             return 0;
         }
@@ -399,30 +422,13 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
     }
 
 
-    private void onFlingFinished(CoordinatorLayout coordinatorLayout, View layout) {
-        changeState(isClosed(layout) ? STATE_CLOSED : STATE_OPENED);
-    }
-
     /**
-     * 作为偏移之后是否需要状态变更
+     * 判断偏移之后是否需要状态变更
      *
      * @param layout
      */
     public void onTranslationFinished(View layout) {
         changeState(isClosed(layout) ? STATE_CLOSED : STATE_OPENED);
-    }
-
-    /**
-     * 外部刷新抽屉状态
-     *
-     * @param child
-     */
-    public void refreshState(View child) {
-        if (isOpen(child)) {
-            changeState(STATE_OPENED);
-        } else if (isClosed(child)) {
-            changeState(STATE_CLOSED);
-        }
     }
 
 
@@ -507,7 +513,6 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
             endY = 0;
         }
         if (endY < 0 - measuredHeight) {
-//            changeState(STATE_CLOSED);
             endY = 0 - measuredHeight;
         }
         ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(child, "translationY",
@@ -584,7 +589,7 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
                 mFlingRunnable = new FlingRunnable(mParent, mLayout);
                 ViewCompat.postOnAnimation(mLayout, mFlingRunnable);
             } else {
-                onFlingFinished(mParent, mLayout);
+                onTranslationFinished(mLayout);
             }
         }
 
@@ -596,13 +601,15 @@ public class HomeHeaderBehavior extends ViewOffsetBehavior {
                     ViewCompat.setTranslationY(mLayout, mOverScroller.getCurrY());
                     ViewCompat.postOnAnimation(mLayout, this);
                 } else {
-                    onFlingFinished(mParent, mLayout);
+                    onTranslationFinished(mLayout);
                 }
             }
         }
     }
 
     /**
+     * 找到Behavior中RecyclerView实例
+     *
      * @param view
      * @return
      */

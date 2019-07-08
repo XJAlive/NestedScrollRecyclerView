@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,9 +24,6 @@ import com.example.xj.nestedrecyclerview.widget.recyclerview.bean.RecyclerViewBe
 import com.example.xj.nestedrecyclerview.widget.refresh.HomeSmartRefreshFooter;
 import com.scwang.smartrefresh.header.MaterialHeader;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
-import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
-import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-import me.ele.uetool.UETool;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -95,24 +89,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         srlContent.setEnableRefresh(false);
         srlHeader.setEnableLoadMore(false);
 
-        srlHeader.setOnRefreshListener(new OnRefreshListener() {
-            @Override
-            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
-                requestHeaderData();
-            }
-        });
-        srlContent.setOnRefreshListener(new OnRefreshListener() {
-            @Override
-            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
-                requestContentData();
-            }
-        });
-        srlContent.setOnLoadMoreListener(new OnLoadMoreListener() {
-            @Override
-            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
-                loadMoreData();
-            }
-        });
+        srlHeader.setOnRefreshListener(refreshLayout -> requestHeaderData());
+        srlContent.setOnRefreshListener(refreshLayout -> requestContentData());
+        srlContent.setOnLoadMoreListener(refreshLayout -> loadMoreData());
 
         MultiItemTypeAdapter headerAdapter = new MultiItemTypeAdapter(this, headerList);
         headerAdapter.addItemViewDelegate(new TopItemView(this));
@@ -148,21 +127,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         CoordinatorLayout.LayoutParams contentParams = (CoordinatorLayout.LayoutParams) rl_home_content.getLayoutParams();
         mHomeContentBehavior = (HomeContentBehavior) contentParams.getBehavior();
-        mHomeContentBehavior.setOnPagerStateListener(new HomeContentBehavior.OnPagerStateListener() {
-
-            @Override
-            public void onViewTranslationChanged(float translationY, float ratio) {
-                //顶部渐变
-                if (ratio > 0.9) {
-                    clTopicHeader.setVisibility(View.VISIBLE);
-                    float alpha = (ratio - 0.9f) * 10;
-                    clTopicHeader.setAlpha(alpha);
-                    rlToolBar.setAlpha(1 - alpha);
-                } else {
-                    clTopicHeader.setVisibility(View.INVISIBLE);
-                    clTopicHeader.setAlpha(1.0f);
-                    rlToolBar.setAlpha(1.0f);
-                }
+        mHomeContentBehavior.setOnPagerStateListener((translationY, ratio) -> {
+            //顶部渐变
+            if (ratio > 0.9) {
+                clTopicHeader.setVisibility(View.VISIBLE);
+                float alpha = (ratio - 0.9f) * 10;
+                clTopicHeader.setAlpha(alpha);
+                rlToolBar.setAlpha(1 - alpha);
+            } else {
+                clTopicHeader.setVisibility(View.INVISIBLE);
+                clTopicHeader.setAlpha(1.0f);
+                rlToolBar.setAlpha(1.0f);
             }
         });
 
@@ -197,12 +172,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         Observable.timer(2, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Long>() {
-                    @Override
-                    public void accept(Long aLong) throws Exception {
-                        Toast.makeText(MainActivity.this, "头部数据刷新完成~", Toast.LENGTH_SHORT).show();
-                        srlHeader.finishRefresh();
-                    }
+                .subscribe(aLong -> {
+                    Toast.makeText(MainActivity.this, "头部数据刷新完成~", Toast.LENGTH_SHORT).show();
+                    srlHeader.finishRefresh();
                 });
     }
 
@@ -211,12 +183,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         Observable.timer(2, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Long>() {
-                    @Override
-                    public void accept(Long aLong) throws Exception {
-                        srlContent.finishRefresh();
-                    }
-                });
+                .subscribe(aLong -> srlContent.finishRefresh());
     }
 
     @SuppressLint("CheckResult")
@@ -224,12 +191,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         Observable.timer(3, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Long>() {
-                    @Override
-                    public void accept(Long aLong) throws Exception {
-                        Toast.makeText(MainActivity.this, "加载完成~", Toast.LENGTH_SHORT).show();
-                        srlContent.finishLoadMore();
-                    }
+                .subscribe(aLong -> {
+                    Toast.makeText(MainActivity.this, "加载完成~", Toast.LENGTH_SHORT).show();
+                    srlContent.finishLoadMore();
                 });
     }
 

@@ -1,6 +1,5 @@
 package com.example.xj.nestedrecyclerview.widget.behavior;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
@@ -14,7 +13,6 @@ import java.util.List;
 
 /**
  * 底部RecyclerView Behavior
- * 跟随顶部控件进行位移滚动
  */
 public class HomeContentBehavior extends HeaderScrollingViewBehavior {
     private static final String TAG = HomeContentBehavior.class.getName();
@@ -33,22 +31,18 @@ public class HomeContentBehavior extends HeaderScrollingViewBehavior {
         return isDependOn(dependency);
     }
 
-    @SuppressLint("NewApi")
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
         offsetChildAsNeeded(parent, child, dependency);
         return false;
     }
 
-    @SuppressLint("NewApi")
     private void offsetChildAsNeeded(CoordinatorLayout parent, View child, View dependency) {
         float dependencyTranslationY = dependency.getTranslationY();
-//        int translationY = (int) (-dependencyTranslationY / (getHeaderOffsetRange(dependency) * 1.0f) *
-//                getScrollRange(dependency));
-        float translationY = -dependencyTranslationY;
-        Log.i(TAG, "offsetChildAsNeeded: translationY=" + translationY + "  dependencyTranslationY=" + dependencyTranslationY);
+        child.setTranslationY(dependencyTranslationY);
 
-        child.setTranslationY(0 - translationY);
+        float translationY = -dependencyTranslationY;
+//        Log.i(TAG, "offsetChildAsNeeded: translationY=" + translationY + "  dependencyTranslationY=" + dependencyTranslationY);
 
         if (mOnPagerStateListener != null) {
             float ratio = translationY * 1.0f / child.getMeasuredHeight();
@@ -68,26 +62,14 @@ public class HomeContentBehavior extends HeaderScrollingViewBehavior {
     @Override
     protected int getScrollRange(View v) {
         if (isDependOn(v)) {
-            return Math.max(0, v.getMeasuredHeight() - getFinalHeight());
+            return Math.max(0, v.getMeasuredHeight());
         } else {
             return super.getScrollRange(v);
         }
     }
 
-    private int getHeaderOffsetRange(View dependency) {
-        return dependency.getMeasuredHeight();
-    }
-
-    private int getFinalHeight() {
-        return 0;
-    }
-
     private boolean isDependOn(View dependency) {
         return dependency != null && dependency.getId() == R.id.rl_home_header;
-    }
-
-    public OnPagerStateListener getOnPagerStateListener() {
-        return mOnPagerStateListener;
     }
 
     public void setOnPagerStateListener(OnPagerStateListener onPagerStateListener) {
