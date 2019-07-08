@@ -170,7 +170,7 @@ public class HomeSmartRefreshHeader extends InternalAbstract implements RefreshH
         } else {
             mRefreshText.setText("刷新失败");
         }
-        return 2500;//延迟3000毫秒之后再弹回
+        return 2000;//延迟2000毫秒之后再弹回
     }
 
     @Override

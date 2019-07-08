@@ -31,24 +31,9 @@ public class PublicMethod {
         return (int) (pxValue / scale + 0.5f);
     }
 
-    /**
-     * 获取去掉边距后的屏幕宽度
-     *
-     * @param appContext
-     * @param edgeDimensResId 边距值需在dimens.xml中定义
-     * @return context==null will return 0
-     */
-    public static int getScreenWidthExcuEdge(Context appContext, int edgeDimensResId) {
-        if (appContext == null) {
-            return 0;
-        }
 
-        int screenWidth = appContext.getResources().getDisplayMetrics().widthPixels;
-        if (screenWidth > 0) {
-            int edgeSize = appContext.getResources().getDimensionPixelSize(edgeDimensResId);
-            screenWidth -= 2 * edgeSize;
-        }
-        return screenWidth;
+    public static int getScreenWidth(Context context) {
+        return context.getResources().getDisplayMetrics().widthPixels;
     }
 
 }

@@ -2,6 +2,7 @@ package com.example.xj.nestedrecyclerview.module.home.adapter;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,17 +17,15 @@ import java.util.List;
 
 public class GridViewTopicAdapter extends BaseAdapter {
 
-    private Context context;
+    private Context mContext;
     private List<String> icons;
     private int width;
 
     public GridViewTopicAdapter(Context context) {
-        this.context = context;
+        this.mContext = context;
 
         //图片宽度
-        if (icons != null && !icons.isEmpty()) {
-            width = (PublicMethod.getScreenWidthExcuEdge(context, 18) - PublicMethod.dip2px(context, 12)) / icons.size();
-        }
+        width = (PublicMethod.getScreenWidth(context) - PublicMethod.dip2px(context, 12 + 18 * 2)) / 3;
     }
 
     @Override
@@ -56,7 +55,7 @@ public class GridViewTopicAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         if (null == convertView) {
             viewHolder = new ViewHolder();
-            convertView = LayoutInflater.from(context).inflate(R.layout.item_gridview_topic, null);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.item_gridview_topic, null);
             viewHolder.iv_icon = convertView.findViewById(R.id.iv_icon);
             convertView.setTag(viewHolder);
         } else {
@@ -67,6 +66,14 @@ public class GridViewTopicAdapter extends BaseAdapter {
             float fHeigh = ((float) 170 / 228) * width;
             RelativeLayout.LayoutParams lp1 = new RelativeLayout.LayoutParams(width, (int) fHeigh);
             viewHolder.iv_icon.setLayoutParams(lp1);
+        }
+
+        if (position % 3 == 0) {
+            viewHolder.iv_icon.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.food1));
+        } else if (position % 3 == 1) {
+            viewHolder.iv_icon.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.food2));
+        } else {
+            viewHolder.iv_icon.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.food3));
         }
 
         return convertView;

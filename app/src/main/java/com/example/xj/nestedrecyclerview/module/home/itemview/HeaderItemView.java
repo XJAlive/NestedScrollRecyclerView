@@ -27,7 +27,7 @@ public class HeaderItemView implements ItemViewDelegate<RecyclerViewBean> {
 
     @Override
     public int getItemViewLayoutId() {
-        return R.layout.block_home_top_tb;
+        return R.layout.item_block_home_header;
     }
 
     @Override

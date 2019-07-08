@@ -1,6 +1,7 @@
 package com.example.xj.nestedrecyclerview.module.home.itemview;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -43,8 +44,9 @@ public class TopItemView implements ItemViewDelegate<RecyclerViewBean> {
         }
 
         tvTitle.setText(String.format("这是一段很长的测试内容,当前位置为 %d", position));
-
         iv_avatar2.setRoundConner(72);
+
+        ivPic.setImageDrawable(ContextCompat.getDrawable(mContext, position % 2 == 0 ? R.mipmap.fruit1 : R.mipmap.fruit2));
     }
 
     @Override

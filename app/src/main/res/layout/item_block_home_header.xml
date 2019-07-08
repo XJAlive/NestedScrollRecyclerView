@@ -10,8 +10,8 @@
     <View
         android:id="@+id/v_interval"
         android:layout_width="match_parent"
-        android:layout_height="0.1dp"
-        android:background="@color/diver_grey"
+        android:layout_height="8dp"
+        android:background="#FAFAFA"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
@@ -21,6 +21,7 @@
         android:layout_marginLeft="18dp"
         android:scaleType="fitCenter"
         android:src="@mipmap/backbn"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -35,7 +36,7 @@
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/img_home_locaiton_back"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/v_interval" />
 
     <View
         android:layout_width="match_parent"

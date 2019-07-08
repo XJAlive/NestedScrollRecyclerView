@@ -9,6 +9,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ import com.example.xj.nestedrecyclerview.widget.refresh.HomeSmartRefreshFooter;
 import com.scwang.smartrefresh.header.MaterialHeader;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
@@ -42,19 +44,22 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private RecyclerView mRecyclerViewHeader, mRecyclerViewContent;
     private RelativeLayout rl_home_header, rl_home_content;
     private SmartRefreshLayout srlHeader, srlContent;
+    private View clTopicHeader;
+    private ImageView imgTopicHeaderBack;
+
+    private RelativeLayout rlToolBar;
 
     private HomeHeaderBehavior mHomeHeaderBehavior;
     private HomeContentBehavior mHomeContentBehavior;
     private RecyclerViewAdapter mHeaderRecyclerViewAdapter, mContentRecyclerViewAdapter;
 
-    private List<RecyclerViewBean> headerList, contentList;
+    private List<RecyclerViewBean> headerList = new ArrayList<>();
+    private List<RecyclerViewBean> contentList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        UETool.showUETMenu(1000);
 
         initView();
         initData();
@@ -70,6 +75,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void initView() {
+        clTopicHeader = findViewById(R.id.cl_home_topic_header);
+        imgTopicHeaderBack = findViewById(R.id.img_home_locaiton_back);
+        imgTopicHeaderBack.setOnClickListener(this);
+        rlToolBar = findViewById(R.id.rl_tool_bar);
         mRecyclerViewHeader = findViewById(R.id.recycler_home_header);
         mRecyclerViewContent = findViewById(R.id.recycler_home_content);
         srlHeader = findViewById(R.id.srl_home_header);
@@ -81,7 +90,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         MaterialHeader materialHeader = new MaterialHeader(this);
         materialHeader.setColorSchemeColors(Color.parseColor("#ff98bf"));
         srlHeader.setRefreshHeader(materialHeader);
-        srlHeader.setRefreshFooter(new HomeSmartRefreshFooter(this));
+        srlContent.setRefreshFooter(new HomeSmartRefreshFooter(this));
         //需要禁用掉顶部下拉刷新控件的加载更多
         srlContent.setEnableRefresh(false);
         srlHeader.setEnableLoadMore(false);
@@ -89,12 +98,21 @@ public class MainActivity extends Activity implements View.OnClickListener {
         srlHeader.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {
-                requestData();
+                requestHeaderData();
             }
         });
-
-        headerList = new ArrayList<>();
-        contentList = new ArrayList<>();
+        srlContent.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                requestContentData();
+            }
+        });
+        srlContent.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
+                loadMoreData();
+            }
+        });
 
         MultiItemTypeAdapter headerAdapter = new MultiItemTypeAdapter(this, headerList);
         headerAdapter.addItemViewDelegate(new TopItemView(this));
@@ -110,11 +128,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
             @Override
             public void onPagerClosed() {
                 srlContent.setEnableRefresh(true);
+                clTopicHeader.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onPagerOpened() {
                 srlContent.setEnableRefresh(false);
+                clTopicHeader.setVisibility(View.GONE);
             }
         });
 
@@ -125,6 +145,27 @@ public class MainActivity extends Activity implements View.OnClickListener {
         LinearLayoutManager layoutManager2 = new LinearLayoutManager(this);
         mRecyclerViewContent.setLayoutManager(layoutManager2);
         mRecyclerViewContent.setAdapter(mContentRecyclerViewAdapter);
+
+        CoordinatorLayout.LayoutParams contentParams = (CoordinatorLayout.LayoutParams) rl_home_content.getLayoutParams();
+        mHomeContentBehavior = (HomeContentBehavior) contentParams.getBehavior();
+        mHomeContentBehavior.setOnPagerStateListener(new HomeContentBehavior.OnPagerStateListener() {
+
+            @Override
+            public void onViewTranslationChanged(float translationY, float ratio) {
+                //顶部渐变
+                if (ratio > 0.9) {
+                    clTopicHeader.setVisibility(View.VISIBLE);
+                    float alpha = (ratio - 0.9f) * 10;
+                    clTopicHeader.setAlpha(alpha);
+                    rlToolBar.setAlpha(1 - alpha);
+                } else {
+                    clTopicHeader.setVisibility(View.INVISIBLE);
+                    clTopicHeader.setAlpha(1.0f);
+                    rlToolBar.setAlpha(1.0f);
+                }
+            }
+        });
+
     }
 
     private void initData() {
@@ -152,15 +193,42 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     @SuppressLint("CheckResult")
-    private void requestData() {
+    private void requestHeaderData() {
+        Observable.timer(2, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        Toast.makeText(MainActivity.this, "头部数据刷新完成~", Toast.LENGTH_SHORT).show();
+                        srlHeader.finishRefresh();
+                    }
+                });
+    }
+
+    @SuppressLint("CheckResult")
+    private void requestContentData() {
+        Observable.timer(2, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        srlContent.finishRefresh();
+                    }
+                });
+    }
+
+    @SuppressLint("CheckResult")
+    private void loadMoreData() {
         Observable.timer(3, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) throws Exception {
-                        Toast.makeText(MainActivity.this, "头部数据刷新完成", Toast.LENGTH_SHORT).show();
-                        srlHeader.finishRefresh();
+                        Toast.makeText(MainActivity.this, "加载完成~", Toast.LENGTH_SHORT).show();
+                        srlContent.finishLoadMore();
                     }
                 });
     }

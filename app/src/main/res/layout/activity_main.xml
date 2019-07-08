@@ -74,7 +74,7 @@
     </android.support.design.widget.CoordinatorLayout>
 
     <include
-        android:id="@+id/cl_home_location"
+        android:id="@+id/cl_home_topic_header"
         layout="@layout/block_home_top_tb"
         android:layout_width="match_parent"
         android:layout_height="48dp"
