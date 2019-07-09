@@ -144,7 +144,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void initData() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             RecyclerViewBean recyclerViewBean = new RecyclerViewBean();
             recyclerViewBean.setType(RecyclerViewBean.TYPE_TOP_ITEM);
             recyclerViewBean.setData(new HomeTopBean());
