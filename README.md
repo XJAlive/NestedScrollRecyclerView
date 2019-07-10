@@ -6,8 +6,6 @@
 就可以使用自定义顶部Behavior + 底部Behavior,
 使用偏移的方式实现嵌套滚动，同时手势连贯不断层，极大的保证交互体验！
 
-原理及实现方式介绍在这里：
-https://www.jianshu.com/p/ffe13743771d
 
 
 ![image](https://github.com/879058443/NestedScrollRecyclerView/blob/master/gif/gifhome_320x568_20s.gif) 
